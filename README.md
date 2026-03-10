@@ -3,7 +3,7 @@
 🚀 **Full-Stack Developer | AI & Machine Learning Engineer | Automation & FinTech Enthusiast**  
 📍 Mohali, Punjab, India
 
-I’m a passionate software engineer with **5+ years of hands-on experience** building **scalable web applications**, **AI-powered systems**, and **intelligent automation solutions**.
+I’m a passionate software engineer with **8+ years of hands-on experience** building **scalable web applications**, **AI-powered systems**, and **intelligent automation solutions**.
 
 Currently pursuing **MCA (Artificial Intelligence & Machine Learning)** from **Amity University Online**, while actively working on **production-grade AI, backend, and full-stack projects**.
 
