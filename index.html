@@ -1538,12 +1538,114 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Toast notifications */
+    .toast-stack {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 260px;
+      max-width: 360px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, .06), rgba(18, 18, 23, .9));
+      box-shadow: 0 15px 35px rgba(0, 0, 0, .25);
+      color: #f6f7fb;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      pointer-events: auto;
+      animation: toastIn .2s ease, float 3s ease-in-out infinite alternate;
+    }
+
+    .toast.success {
+      border-color: rgba(0, 217, 192, .35);
+      box-shadow: 0 18px 40px rgba(0, 217, 192, .15);
+    }
+
+    .toast.error {
+      border-color: rgba(255, 92, 58, .35);
+      box-shadow: 0 18px 40px rgba(255, 92, 58, .18);
+    }
+
+    .toast .ico {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+
+    .toast.success .ico {
+      background: rgba(0, 217, 192, .15);
+      color: #00d9c0;
+    }
+
+    .toast.error .ico {
+      background: rgba(255, 92, 58, .15);
+      color: #ff5c3a;
+    }
+
+    .toast .t-msg {
+      font-weight: 600;
+      letter-spacing: .1px;
+    }
+
+    .toast .t-close {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .6);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      transition: color .15s ease;
+    }
+
+    .toast .t-close:hover {
+      color: #fff;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px) scale(.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes float {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-2px);
+      }
+    }
   </style>
 </head>
 
 <body>
   <div id="cursor"></div>
   <div id="cursor-ring"></div>
+  <div class="toast-stack" id="toastStack"></div>
   <div class="blob" style="width:700px;height:700px;top:-200px;left:-200px;background:var(--acc1);"></div>
   <div class="blob" style="width:500px;height:500px;top:50%;right:-200px;background:var(--acc2);"></div>
   <div class="blob" style="width:400px;height:400px;bottom:-100px;left:40%;background:var(--acc3);opacity:.05;"></div>
@@ -2252,6 +2354,26 @@
     function toggleMob() { document.getElementById('mobileNav').classList.toggle('open'); }
     function closeMob() { document.getElementById('mobileNav').classList.remove('open'); }
 
+    const toastStack = document.getElementById('toastStack');
+    function showToast(type, message) {
+      if (!toastStack) return alert(message);
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="ico">${type === 'success' ? '✅' : '⚠️'}</div>
+        <div class="t-msg">${message}</div>
+        <button class="t-close" aria-label="Close">&times;</button>
+      `;
+      const removeToast = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-6px) scale(.98)';
+        setTimeout(() => toast.remove(), 180);
+      };
+      toast.querySelector('.t-close').addEventListener('click', removeToast);
+      toastStack.appendChild(toast);
+      setTimeout(removeToast, 4200);
+    }
+
     const form = document.getElementById('form');
     if (form) {
       const submitBtn = form.querySelector('button[type=\"submit\"]');
@@ -2275,15 +2397,11 @@
 
           const data = await response.json();
 
-          if (response.ok) {
-            alert('Success! Your message has been sent.');
-            form.reset();
-          } else {
-            alert('Error: ' + (data.message || 'Unable to send message.'));
-          }
+          if (response.ok) { showToast('success', 'Message sent! I will reply within 24 hours.'); form.reset(); }
+          else { showToast('error', data.message || 'Unable to send message.'); }
 
         } catch (error) {
-          alert('Something went wrong. Please try again.');
+          showToast('error', 'Something went wrong. Please try again.');
         } finally {
           submitBtn.textContent = originalText;
           submitBtn.disabled = false;
